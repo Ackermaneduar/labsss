@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "name": "demo-image"
+  },
+  "spec": {
+    "source": {
+      "image": "nginx:latest"
+    }
+  }
+}
