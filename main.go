@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"sync"
+	"strings"
 )
 
 // Estructuras para el manifiesto
@@ -24,11 +26,22 @@ var (
 	mu        sync.Mutex
 )
 
+func validateManifest(m Manifest) error {
+	if strings.TrimSpace(m.Metadata.Name) == "" {
+		return errors.New("el campo 'metadata.name' es obligatorio")
+	}
+	if strings.TrimSpace(m.Spec.Source.Image) == "" {
+		return errors.New("el campo 'spec.source.image' es obligatorio")
+	}
+	return nil
+}
+
 func setupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
 
-	// Endpoint para crear manifiestos (POST)
-	mux.HandleFunc("/manifiesto", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v1/manifests", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Recibida %s %s", r.Method, r.URL.Path)
+
 		if r.Method != http.MethodPost {
 			http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
 			return
@@ -36,7 +49,14 @@ func setupRoutes() *http.ServeMux {
 
 		var manifest Manifest
 		if err := json.NewDecoder(r.Body).Decode(&manifest); err != nil {
+			log.Printf("Error decodificando JSON: %v", err)
 			http.Error(w, "JSON inválido", http.StatusBadRequest)
+			return
+		}
+
+		if err := validateManifest(manifest); err != nil {
+			log.Printf("Validación fallida: %v", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -51,9 +71,17 @@ func setupRoutes() *http.ServeMux {
 		})
 	})
 
-	// Endpoint para ver estado (GET)
-	mux.HandleFunc("/status", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/api/v1/status", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Recibida %s %s", r.Method, r.URL.Path)
+
+		if r.Method != http.MethodGet {
+			http.Error(w, "Método no permitido", http.StatusMethodNotAllowed)
+			return
+		}
+
 		w.Header().Set("Content-Type", "application/json")
+		mu.Lock()
+		defer mu.Unlock()
 		json.NewEncoder(w).Encode(manifests)
 	})
 

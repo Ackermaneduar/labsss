@@ -9,9 +9,7 @@ import (
 )
 
 func TestCreateManifest(t *testing.T) {
-	// Limpiar el mapa antes de test
 	manifests = make(map[string]Manifest)
-
 	mux := setupRoutes()
 
 	tests := []struct {
@@ -36,7 +34,21 @@ func TestCreateManifest(t *testing.T) {
 			expectedBody: "JSON inválido",
 		},
 		{
-			name:         "Método no permitido",
+			name:         "Nombre vacío",
+			method:       http.MethodPost,
+			payload:      `{"metadata":{"name":""},"spec":{"source":{"image":"nginx:latest"}}}`,
+			expectedCode: http.StatusBadRequest,
+			expectedBody: "el campo 'metadata.name' es obligatorio",
+		},
+		{
+			name:         "Imagen vacía",
+			method:       http.MethodPost,
+			payload:      `{"metadata":{"name":"test2"},"spec":{"source":{"image":""}}}`,
+			expectedCode: http.StatusBadRequest,
+			expectedBody: "el campo 'spec.source.image' es obligatorio",
+		},
+		{
+			name:         "Método no permitido en manifests",
 			method:       http.MethodGet,
 			payload:      "",
 			expectedCode: http.StatusMethodNotAllowed,
@@ -48,14 +60,13 @@ func TestCreateManifest(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var req *http.Request
 			if tt.payload != "" {
-				req = httptest.NewRequest(tt.method, "/manifiesto", strings.NewReader(tt.payload))
+				req = httptest.NewRequest(tt.method, "/api/v1/manifests", strings.NewReader(tt.payload))
 			} else {
-				req = httptest.NewRequest(tt.method, "/manifiesto", nil)
+				req = httptest.NewRequest(tt.method, "/api/v1/manifests", nil)
 			}
 			req.Header.Set("Content-Type", "application/json")
 
 			rr := httptest.NewRecorder()
-
 			mux.ServeHTTP(rr, req)
 
 			if status := rr.Code; status != tt.expectedCode {
@@ -70,7 +81,6 @@ func TestCreateManifest(t *testing.T) {
 }
 
 func TestGetStatus(t *testing.T) {
-	// Preparar datos de prueba
 	manifests = map[string]Manifest{
 		"test1": {
 			Metadata: struct{ Name string `json:"name"` }{Name: "test1"},
@@ -82,21 +92,36 @@ func TestGetStatus(t *testing.T) {
 
 	mux := setupRoutes()
 
-	req := httptest.NewRequest(http.MethodGet, "/status", nil)
-	rr := httptest.NewRecorder()
+	t.Run("GET válido", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/status", nil)
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
 
-	mux.ServeHTTP(rr, req)
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("Código de estado incorrecto: obtuve %v, esperaba %v", status, http.StatusOK)
+		}
 
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("Código de estado incorrecto: obtuve %v, esperaba %v", status, http.StatusOK)
-	}
+		var response map[string]Manifest
+		if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
+			t.Fatalf("No se pudo decodificar la respuesta: %v", err)
+		}
 
-	var response map[string]Manifest
-	if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
-		t.Fatalf("No se pudo decodificar la respuesta: %v", err)
-	}
+		if len(response) != 1 || response["test1"].Spec.Source.Image != "nginx:latest" {
+			t.Errorf("Respuesta inesperada: %v", response)
+		}
+	})
 
-	if len(response) != 1 || response["test1"].Spec.Source.Image != "nginx:latest" {
-		t.Errorf("Respuesta inesperada: %v", response)
-	}
+	t.Run("Método no permitido", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/api/v1/status", nil)
+		rr := httptest.NewRecorder()
+		mux.ServeHTTP(rr, req)
+
+		if status := rr.Code; status != http.StatusMethodNotAllowed {
+			t.Errorf("Código de estado incorrecto: obtuve %v, esperaba %v", status, http.StatusMethodNotAllowed)
+		}
+
+		if !strings.Contains(rr.Body.String(), "Método no permitido") {
+			t.Errorf("Cuerpo de respuesta inesperado: %v", rr.Body.String())
+		}
+	})
 }

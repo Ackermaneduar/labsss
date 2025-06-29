@@ -10,29 +10,43 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-    
-    - name: Run unit tests
-      run: go test -v ./...
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  build:
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run unit tests
+        run: go test -v ./...
+
+  build-and-test-docker:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build Docker image
-      run: docker build -t labs-tape .
-    
-    - name: Run container
-      run: |
-        docker run -d -p 42113:42113 --name test-container labs-tape
-        sleep 5  # Espera que el servidor inicie
-        curl -X POST http://localhost:42113/api/v1/manifests \
-          -H "Content-Type: application/json" \
-          -d '{"metadata":{"name":"ci-test"},"spec":{"source":{"image":"alpine:latest"}}}'
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t mi-servidor-docker .
+
+      - name: Run Docker container in background
+        run: docker run -d -p 42113:42113 --name test-container mi-servidor-docker
+
+      - name: Wait for server to start
+        run: sleep 5
+
+      - name: Test API endpoint with curl
+        run: |
+          curl -X POST http://localhost:42113/api/v1/manifests \
+            -H "Content-Type: application/json" \
+            -d '{"metadata":{"name":"ci-test"},"spec":{"source":{"image":"alpine:latest"}}}'
+
+      - name: Stop and remove container
+        run: |
+          docker stop test-container
+          docker rm test-container
