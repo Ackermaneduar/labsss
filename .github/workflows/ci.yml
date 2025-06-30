@@ -27,7 +27,7 @@ jobs:
           go test -v ./... > reporte/reporte-pruebas.txt
 
       - name: Upload test report as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: reporte-pruebas
           path: reporte/reporte-pruebas.txt
