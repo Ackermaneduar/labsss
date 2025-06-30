@@ -1,0 +1,12 @@
+{
+  "apiVersion": "tape.sh/v1alpha1",
+  "kind": "Image",
+  "metadata": {
+    "name": "demo-image"
+  },
+  "spec": {
+    "source": {
+      "image": "nginx:latest"
+    }
+  }
+}
