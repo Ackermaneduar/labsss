@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "name": "imagen-de-labs"
+  },
+  "spec": {
+    "source": {
+      "image": "nginx:latest"
+    }
+  }
+}

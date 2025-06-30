@@ -21,8 +21,16 @@ jobs:
       - name: Download dependencies
         run: go mod download
 
-      - name: Run unit tests
-        run: go test -v ./...
+      - name: Run unit tests and save report
+        run: |
+          mkdir -p reporte
+          go test -v ./... > reporte/reporte-pruebas.txt
+
+      - name: Upload test report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: reporte-pruebas
+          path: reporte/reporte-pruebas.txt
 
   build-and-test-docker:
     needs: test
