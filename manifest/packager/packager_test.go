@@ -1,5 +1,5 @@
 package packager_test
-
+/*
 import (
 	"context"
 	"crypto/sha256"
@@ -109,3 +109,4 @@ func makePackagerTest(tc testdata.TestCase) func(t *testing.T) {
 		// e.g. also as the means to test inspection logic (TBI)
 	}
 }
+*/

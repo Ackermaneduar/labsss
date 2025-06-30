@@ -1,5 +1,5 @@
 package loader
-
+/*
 import (
 	"fmt"
 	"io/fs"
@@ -213,3 +213,4 @@ func useKustomize(paths ...string) bool {
 	}
 	return false
 }
+*/

@@ -1,5 +1,5 @@
 package imageresolver
-
+/*
 import (
 	"context"
 	"fmt"
@@ -145,3 +145,4 @@ func (c *RegistryResolver) FindRelatedFromIndecies(ctx context.Context, images *
 // 	i.Digest = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" // empty string
 // 	return nil
 // }
+*/

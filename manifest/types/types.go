@@ -1,5 +1,5 @@
 package types
-
+/*
 import (
 	kustomize "sigs.k8s.io/kustomize/api/types"
 
@@ -35,3 +35,4 @@ func ImagePaths() []kustomize.FieldSpec {
 		{Path: "items[]/spec/template/spec/initContainers[]/image"},
 	}
 }
+*/

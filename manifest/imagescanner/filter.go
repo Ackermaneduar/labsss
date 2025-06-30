@@ -1,5 +1,5 @@
 package imagescanner
-
+/*
 import (
 	"sigs.k8s.io/kustomize/kyaml/kio"
 	"sigs.k8s.io/kustomize/kyaml/yaml"
@@ -97,3 +97,4 @@ func (t *Tracker) SetValueArgs() []SetValueArg {
 func (t *Tracker) Reset() {
 	t.setValueArgs = nil
 }
+*/

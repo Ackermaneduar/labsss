@@ -1,5 +1,5 @@
 package digest
-
+/*
 import (
 	"encoding/hex"
 	"encoding/json"
@@ -44,3 +44,4 @@ func (d *SHA256) UnmarshalJSON(data []byte) error {
 func (d SHA256) IsEqual(checksum string) bool { return d.String() == checksum }
 
 func (d SHA256) String() string { return string(d) }
+*/

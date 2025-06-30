@@ -1,5 +1,5 @@
 package manifest
-
+/*
 import (
 	"cmp"
 
@@ -122,3 +122,4 @@ func (a ImageRefenceWithLocation) Compare(b ImageRefenceWithLocation) attestType
 	}
 	return attestTypes.CmpEqual()
 }
+*/

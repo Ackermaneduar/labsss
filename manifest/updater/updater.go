@@ -1,5 +1,5 @@
 package updater
-
+/*
 import (
 	"crypto/sha256"
 	"fmt"
@@ -106,3 +106,4 @@ func (u *FileUpdater) doUpdate(manifestPath string, images []types.Image) error 
 }
 
 func (u *FileUpdater) Mutations() attestTypes.Mutations { return u.mutations }
+*/

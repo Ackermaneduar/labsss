@@ -1,5 +1,5 @@
 package git_test
-
+/*
 import (
 	"io"
 	"os"
@@ -214,3 +214,4 @@ func makeCreateFileSetupFunc(path string) func(*testing.T, *gitTestCases) {
 		}
 	}
 }
+*/

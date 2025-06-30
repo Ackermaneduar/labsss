@@ -1,1 +1,0 @@
-# certs - a utility for generating self-signed certificates for use in development environments.

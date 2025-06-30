@@ -1,5 +1,5 @@
 package manifest
-
+/*
 import (
 	"cmp"
 
@@ -54,3 +54,4 @@ func (a SourceDirectory) Compare(b SourceDirectory) types.Cmp {
 	cmp := a.VCSEntries.Compare(*b.VCSEntries)
 	return &cmp
 }
+*/

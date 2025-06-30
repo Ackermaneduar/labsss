@@ -1,5 +1,5 @@
 package types
-
+/*
 import (
 	"bytes"
 	"cmp"
@@ -423,3 +423,4 @@ func (a GenericStatement[T]) Compare(b Statement) Cmp {
 	}
 	return a.Predicate.Compare(b.GetPredicate())
 }
+*/

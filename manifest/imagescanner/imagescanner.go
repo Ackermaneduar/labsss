@@ -1,5 +1,5 @@
 package imagescanner
-
+/*
 import (
 	"hash"
 	"io"
@@ -115,3 +115,4 @@ func (s *DefaultImageScanner) Reset() {
 	s.trackers = []*Tracker{}
 	s.attestor = nil
 }
+*/

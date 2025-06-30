@@ -1,5 +1,5 @@
 package git
-
+/*
 import (
 	"fmt"
 	"io"
@@ -447,3 +447,4 @@ func detectRepo(path string) (*gogit.Repository, bool) {
 	}
 	return detectRepo(dir)
 }
+*/

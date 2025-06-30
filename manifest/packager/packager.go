@@ -1,5 +1,5 @@
 package packager
-
+/*
 import (
 	"context"
 	"time"
@@ -36,3 +36,4 @@ func (r *DefaultPackager) Push(ctx context.Context, dir string) (string, error) 
 	return r.Client.PushArtefact(ctx, r.destinationRef, dir,
 		r.sourceEpochTimestamp, r.sourceAttestations...)
 }
+*/

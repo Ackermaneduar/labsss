@@ -1,5 +1,5 @@
 package attest
-
+/*
 import (
 	"fmt"
 
@@ -32,3 +32,4 @@ func DetectVCS(path string) (bool, *PathCheckerRegistry, error) {
 	}
 	return false, nil, nil
 }
+*/

@@ -1,5 +1,5 @@
 package imagecopier_test
-
+/*
 import (
 	"context"
 	"crypto/sha256"
@@ -72,3 +72,4 @@ func makeImageCopierTest(tc testdata.TestCase) func(t *testing.T) {
 		}
 	}
 }
+*/

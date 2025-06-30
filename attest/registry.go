@@ -1,5 +1,5 @@
 package attest
-
+/*
 import (
 	"bytes"
 	"encoding/json"
@@ -191,3 +191,4 @@ func (r *PathCheckerRegistry) pathFromWorkDir(path string) string {
 func (r *PathCheckerRegistry) makeKey(path string, digest digest.SHA256) types.PathCheckerRegistryKey {
 	return types.PathCheckerRegistryKey{Path: path, Digest: digest}
 }
+*/

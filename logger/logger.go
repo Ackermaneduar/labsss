@@ -1,5 +1,5 @@
 package logger
-
+/*
 import (
 	"fmt"
 
@@ -24,3 +24,4 @@ func (l *Logger) SetLevel(level string) error {
 	l.Level = logrusLevel
 	return nil
 }
+*/

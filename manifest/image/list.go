@@ -1,5 +1,5 @@
 package image
-
+/*
 import (
 	"cmp"
 	"encoding/json"
@@ -191,3 +191,4 @@ func (l *ImageList) GroupByManifest() map[string]*ImageList {
 func (l *ImageList) MarshalJSON() ([]byte, error) {
 	return json.Marshal(l.items)
 }
+*/
