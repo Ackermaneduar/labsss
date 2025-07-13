@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manifiestos Docker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-6">
+    <h1 class="text-2xl font-bold mb-4 text-center">🚀 Gestor de Manifiestos Docker</h1>
+
+    <!-- Formulario para subir archivo -->
+    <div class="mb-6">
+      <label class="block mb-2 font-semibold">Sube un manifiesto (.json):</label>
+      <input type="file" id="fileInput" accept=".json" class="mb-4">
+      <button onclick="uploadManifest()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+        Enviar
+      </button>
+    </div>
+
+    <!-- Resultado -->
+    <div id="result" class="mb-6 text-sm"></div>
+
+    <!-- Tabla del estado actual -->
+    <h2 class="text-xl font-semibold mb-2">📦 Imágenes Registradas</h2>
+    <button onclick="loadStatus()" class="bg-green-600 text-white px-3 py-1 mb-4 rounded hover:bg-green-700">
+      Recargar Estado
+    </button>
+    <table class="min-w-full text-sm border">
+      <thead class="bg-gray-200">
+        <tr>
+          <th class="border px-4 py-2">Nombre</th>
+          <th class="border px-4 py-2">Imagen</th>
+        </tr>
+      </thead>
+      <tbody id="statusTable" class="bg-white"></tbody>
+    </table>
+  </div>
+
+  <script>
+    function uploadManifest() {
+      const file = document.getElementById('fileInput').files[0];
+      const resultDiv = document.getElementById('result');
+      if (!file) {
+        resultDiv.textContent = '⚠️ Debes seleccionar un archivo .json';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        fetch('/api/v1/manifests', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: e.target.result,
+        })
+        .then(res => res.json())
+        .then(data => {
+          resultDiv.textContent = `✅ ${data.message || JSON.stringify(data)}`;
+          loadStatus();
+        })
+        .catch(err => {
+          resultDiv.textContent = '❌ Error al enviar manifiesto: ' + err;
+        });
+      };
+      reader.readAsText(file);
+    }
+
+    function loadStatus() {
+      fetch('/api/v1/status')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('statusTable');
+          tbody.innerHTML = '';
+          Object.values(data).forEach(item => {
+            const row = `<tr>
+              <td class="border px-4 py-2">${item.metadata.name}</td>
+              <td class="border px-4 py-2">${item.spec.source.image}</td>
+            </tr>`;
+            tbody.innerHTML += row;
+          });
+        });
+    }
+
+    window.onload = loadStatus;
+  </script>
+</body>
+</html>

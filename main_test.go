@@ -9,7 +9,7 @@ import (
 )
 
 func TestCreateManifest(t *testing.T) {
-	manifests = make(map[string]Manifest)
+	manifests = make(map[string]StoredManifest)
 	mux := setupRoutes()
 
 	tests := []struct {
@@ -81,12 +81,23 @@ func TestCreateManifest(t *testing.T) {
 }
 
 func TestGetStatus(t *testing.T) {
-	manifests = map[string]Manifest{
+	manifests = map[string]StoredManifest{
 		"test1": {
-			Metadata: struct{ Name string `json:"name"` }{Name: "test1"},
-			Spec: struct{ Source struct{ Image string `json:"image"` } `json:"source"` }{
-				Source: struct{ Image string `json:"image"` }{Image: "nginx:latest"},
+			Manifest: Manifest{
+				Metadata: struct {
+					Name string `json:"name"`
+				}{Name: "test1"},
+				Spec: struct {
+					Source struct {
+						Image string `json:"image"`
+					} `json:"source"`
+				}{
+					Source: struct {
+						Image string `json:"image"`
+					}{Image: "nginx:latest"},
+				},
 			},
+			Port: 8081,
 		},
 	}
 
@@ -101,12 +112,12 @@ func TestGetStatus(t *testing.T) {
 			t.Errorf("Código de estado incorrecto: obtuve %v, esperaba %v", status, http.StatusOK)
 		}
 
-		var response map[string]Manifest
+		var response map[string]StoredManifest
 		if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
 			t.Fatalf("No se pudo decodificar la respuesta: %v", err)
 		}
 
-		if len(response) != 1 || response["test1"].Spec.Source.Image != "nginx:latest" {
+		if len(response) != 1 || response["test1"].Manifest.Spec.Source.Image != "nginx:latest" {
 			t.Errorf("Respuesta inesperada: %v", response)
 		}
 	})

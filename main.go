@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os/exec"
@@ -10,7 +11,7 @@ import (
 	"sync"
 )
 
-// Estructura del manifiesto
+// Estructura del manifiesto original
 type Manifest struct {
 	Metadata struct {
 		Name string `json:"name"`
@@ -22,9 +23,16 @@ type Manifest struct {
 	} `json:"spec"`
 }
 
+// Estructura extendida para guardar también el puerto usado
+type StoredManifest struct {
+	Manifest Manifest `json:"manifest"`
+	Port     int      `json:"port"`
+}
+
 var (
-	manifests = make(map[string]Manifest)
+	manifests = make(map[string]StoredManifest)
 	mu        sync.Mutex
+	portBase  = 8081
 )
 
 // Validación de campos obligatorios
@@ -57,26 +65,22 @@ func stopAndRemoveContainer(name string) {
 	_ = runCommand("docker", "rm", "-f", name)
 }
 
-// Ejecuta `docker run` con nombre de contenedor igual a manifest.Metadata.Name
-func runDockerContainer(manifest Manifest) error {
-	// Primero detener y eliminar contenedor existente con ese nombre
+// Ejecuta `docker run` en el puerto asignado
+func runDockerContainer(manifest Manifest, port int) error {
 	stopAndRemoveContainer(manifest.Metadata.Name)
-
-	// Ejecutar nuevo contenedor en modo detached (-d)
-	// Mapea puerto 80 del contenedor al puerto 8080 + un offset para evitar choques (opcional)
-	// Aquí solo mapeamos puerto 80 al 8080 para que puedas ajustar según la imagen
 	args := []string{
 		"run", "-d",
 		"--name", manifest.Metadata.Name,
-		"-p", "8081:80",
+		"-p", fmt.Sprintf("%d:80", port),
 		manifest.Spec.Source.Image,
 	}
-
 	return runCommand("docker", args...)
 }
 
 func setupRoutes() *http.ServeMux {
 	mux := http.NewServeMux()
+
+	mux.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 
 	mux.HandleFunc("/api/v1/manifests", func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Recibida %s %s", r.Method, r.URL.Path)
@@ -105,20 +109,28 @@ func setupRoutes() *http.ServeMux {
 			return
 		}
 
-		if err := runDockerContainer(manifest); err != nil {
+		mu.Lock()
+		port := portBase + len(manifests) // asignación dinámica
+		mu.Unlock()
+
+		if err := runDockerContainer(manifest, port); err != nil {
 			log.Printf("Error al correr contenedor: %v", err)
 			http.Error(w, "Error al iniciar el contenedor Docker", http.StatusInternalServerError)
 			return
 		}
 
 		mu.Lock()
-		manifests[manifest.Metadata.Name] = manifest
+		manifests[manifest.Metadata.Name] = StoredManifest{
+			Manifest: manifest,
+			Port:     port,
+		}
 		mu.Unlock()
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]string{
+		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  "ok",
 			"message": "Imagen " + manifest.Spec.Source.Image + " registrada y contenedor iniciado con nombre " + manifest.Metadata.Name,
+			"port":    port,
 		})
 	})
 
@@ -139,7 +151,7 @@ func setupRoutes() *http.ServeMux {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(`
-			<h2> Servidor de Manifiestos</h2>
+			<h2>🚀 Servidor de Manifiestos</h2>
 			<p>Usa <code>POST /api/v1/manifests</code> para registrar una imagen</p>
 			<p>Usa <code>GET /api/v1/status</code> para ver las registradas</p>
 		`))
