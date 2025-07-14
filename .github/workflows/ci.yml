@@ -24,7 +24,7 @@ jobs:
       - name: Run unit tests and save report
         run: |
           mkdir -p reporte
-          go test -v ./... > reporte/reporte-pruebas.txt
+          go test -v . > reporte/reporte-pruebas.txt
 
       - name: Upload test report as artifact
         uses: actions/upload-artifact@v4
