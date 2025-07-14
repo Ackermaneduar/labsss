@@ -25,8 +25,8 @@ type Manifest struct {
 
 // Estructura extendida para guardar también el puerto usado
 type StoredManifest struct {
-	Manifest Manifest `json:"manifest"`
-	Port     int      `json:"port"`
+	Manifest
+	Port int `json:"port"`
 }
 
 var (
