@@ -151,7 +151,7 @@ func setupRoutes() *http.ServeMux {
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html")
 		w.Write([]byte(`
-			<h2>🚀 Servidor de Manifiestos</h2>
+			<h2> Servidor de Manifiestos</h2>
 			<p>Usa <code>POST /api/v1/manifests</code> para registrar una imagen</p>
 			<p>Usa <code>GET /api/v1/status</code> para ver las registradas</p>
 		`))
