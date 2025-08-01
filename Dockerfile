@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o tape .
 
 # Runtime stage
 FROM alpine:latest
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates docker-cli
 
 COPY --from=builder /app/tape /tape
 COPY --from=builder /app/web /app/web  
