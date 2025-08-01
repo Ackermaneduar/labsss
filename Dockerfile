@@ -14,7 +14,7 @@ FROM alpine:latest
 RUN apk --no-cache add ca-certificates docker-cli
 
 COPY --from=builder /app/tape /tape
-COPY --from=builder /app/web /app/web  
+COPY --from=builder /app/web ./web  
 
 
 EXPOSE 42113
